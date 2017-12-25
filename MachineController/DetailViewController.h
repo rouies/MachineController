@@ -9,5 +9,8 @@
 #import <UIKit/UIKit.h>
 
 @interface DetailViewController : UIViewController
+@property (strong,nonatomic) NSString* name;
+@property (strong,nonatomic) NSString* identity;
+@property (weak, nonatomic) IBOutlet UINavigationItem *nav_item;
 
 @end

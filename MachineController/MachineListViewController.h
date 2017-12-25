@@ -17,4 +17,6 @@
 @property (nonatomic,strong) NSMutableArray* filterList;
 @property (weak, nonatomic) IBOutlet UINavigationItem *nativeBar;
 @property (nonatomic,strong) UISearchController* searchController;
+
+-(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender;
 @end

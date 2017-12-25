@@ -16,7 +16,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    [self.nav_item setTitle:self.name];
 }
 
 - (void)didReceiveMemoryWarning {

@@ -133,7 +133,7 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                         <connections>
-                                            <segue destination="cEu-2v-Owq" kind="show" id="iqD-Dn-Ygv"/>
+                                            <segue destination="cEu-2v-Owq" kind="show" identifier="SegueDetail" id="iqD-Dn-Ygv"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>
@@ -184,6 +184,9 @@
                             </connections>
                         </barButtonItem>
                     </navigationItem>
+                    <connections>
+                        <outlet property="nav_item" destination="4bE-p1-Re4" id="X5U-NQ-IPQ"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dQh-fE-Wky" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

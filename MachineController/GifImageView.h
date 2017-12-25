@@ -9,5 +9,5 @@
 #import <UIKit/UIKit.h>
 
 @interface GifImageView : UIImageView
-
+-(instancetype) initWithPath:(NSString*) path andFrame:(CGRect) rect;
 @end

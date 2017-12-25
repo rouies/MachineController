@@ -84,4 +84,12 @@
     [self.tableView reloadData];
 }
 
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    if(self.handler != nil){
+        NSString* name = self.filterList[indexPath.row][@"obj_name"];
+        NSString* identity = self.filterList[indexPath.row][@"id"];
+        self.handler(identity, name);
+    }
+}
+
 @end

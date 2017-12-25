@@ -11,6 +11,7 @@
 #import <CommonCrypto/CommonCrypto.h>
 #import "MachineListViewController.h"
 
+
 @interface ViewController ()
 
 @end
@@ -58,6 +59,7 @@
     manager.requestSerializer = [AFHTTPRequestSerializer serializer];
     manager.responseSerializer = [AFHTTPResponseSerializer serializer];
     [manager.responseSerializer setAcceptableContentTypes:[NSSet setWithObjects:@"text/plain",@"text/html",nil]];
+    [self showMask];
     [manager GET:self.loginUrl parameters:nil progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         NSString* serverTime = [[NSString alloc] initWithData:responseObject encoding:NSUTF8StringEncoding];
         if(serverTime.length == 17){
@@ -73,79 +75,66 @@
             NSString* pwd = [self stringByMd5:str];
             NSDictionary* pars = @{@"account":account,@"password":pwd};
             [postManager POST:self.loginUrl parameters:pars progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+                [self closeMask];
                 int isSuccess = [responseObject[@"Error"] intValue];
                 if(!isSuccess){
-                    [self performSegueWithIdentifier:@"ViewtoMachineList" sender:self];
-                   [self alertString:@"登陆成功" andTitle:@"登陆"];
+                   [self performSegueWithIdentifier:@"ViewtoMachineList" sender:self];
+                   //[self alertString:@"登陆成功" andTitle:@"登陆"];
                 }else{
                     NSString* errorMsg = responseObject[@"Message"];
                     [self alertString:errorMsg andTitle:@"登陆"];
                 }
             } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-                [self alertString:@"您的网络有问题，请确认网络情况良好后重试！" andTitle:@"登陆"];
+                [self closeMask];
+                [self alertString:@"您的网络有问题，请确认网络情况良好后重试！Login Error90" andTitle:@"登陆"];
             }];
+        } else {
+             [self closeMask];
+             [self alertString:@"您的网络有问题，请确认网络情况良好后重试！Time Length Error " andTitle:@"登陆"];
         }
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-        [self alertString:@"您的网络有问题，请确认网络情况良好后重试！" andTitle:@"登陆"];
+        [self closeMask];
+        [self alertString:@"您的网络有问题，请确认网络情况良好后重试！Error Time" andTitle:@"登陆"];
     }];
 
 }
+
+-(void)showMask{
+    self.imageView.animationDuration = 1;
+    self.imageView.animationRepeatCount = 0;
+    [self.imageView startAnimating];
+    [self.view addSubview:self.maskView];
+}
+
+-(void)closeMask{
+    [self.imageView stopAnimating];
+    [self.maskView removeFromSuperview];
+}
+
 - (IBAction)clk:(id)sender {
-    //[self performSegueWithIdentifier:@"ViewtoMachineList" sender:self];
-//    UIView* maskView = [[UIView alloc] initWithFrame:CGRectMake(100.0f, 100.0f, 200.0f, 200.0f)];
-    UIView* maskView = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
-    maskView.backgroundColor = [UIColor colorWithRed:0.0f green:0.0f blue:0.0f alpha:0.5f];
-    /*
-    UIImageView* loadImageView = [[UIImageView alloc] initWithFrame:CGRectMake(200, 200, 200, 200)];
-    loadImageView.image = [UIImage imageNamed:@"win_item"];
-    loadImageView.layer.masksToBounds = YES;
-    loadImageView.layer.cornerRadius = 10;
-    [maskView addSubview:loadImageView];
-     */
-    /*
-    UIWebView* imageView = [[UIWebView alloc]initWithFrame:CGRectMake(200, 200, 200, 200)];
-    NSURL* url = [[NSBundle mainBundle] URLForResource:@"loading" withExtension:@"gif"];
-    [imageView loadRequest:[NSURLRequest requestWithURL:url]];
-    
-    [maskView addSubview:imageView];
-     
-    [self.view addSubview:maskView];
-    */
-    
-    UIImageView* imageView = [[UIImageView alloc] initWithFrame:CGRectMake(200, 200, 200, 200)];
-    //1.找到gif文件路径
-    NSString *dataPath = [[NSBundle mainBundle]pathForResource:@"loading" ofType:@"gif"];
-    //2.获取gif文件数据
-    CGImageSourceRef source = CGImageSourceCreateWithURL((CFURLRef)[NSURL fileURLWithPath:dataPath], NULL);
-    //3.获取gif文件中图片的个数
-    size_t count = CGImageSourceGetCount(source);
-    //4.定义一个变量记录gif播放一轮的时间
-    //5.定义一个可变数组存放所有图片
-    NSMutableArray *imageArray = [[NSMutableArray alloc] init];
-    for (size_t i=0; i<count; i++) {
-        CGImageRef image = CGImageSourceCreateImageAtIndex(source, i, NULL);
-        UIImage* itemImg = [UIImage imageWithCGImage:image];
-        [imageArray addObject:itemImg];
-        CGImageRelease(image);
-        //获取图片信息
-        //NSDictionary *info = (__bridge NSDictionary *)CGImageSourceCopyPropertiesAtIndex(source, i, NULL);
-        //NSLog(@"info---%@",info);
-    }
-    imageView.animationImages = imageArray; //获取Gif图片列表
-    imageView.animationDuration = 5;     //执行一次完整动画所需的时长
-    imageView.animationRepeatCount = 0;  //动画重复次数
-    [imageView startAnimating];
-    
-    [maskView addSubview:imageView];
-    [self.view addSubview:maskView];
+    [self performSegueWithIdentifier:@"ViewtoMachineList" sender:self];
+    //[self showMask];
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    _width = 80.0f;
+    _height = 80.0f;
+    CGFloat w = [UIScreen mainScreen].bounds.size.width;
+    CGFloat h = [UIScreen mainScreen].bounds.size.height;
+    CGFloat x = (w -self.width) / 2.0f;
+    CGFloat y = (h - self.height) / 2.0f;
+    CGRect rect = CGRectMake(x, y, self.width, self.height);
+    
     self.loginUrl = @"http://172.27.35.1:8080/eng/PpnRentLoginServices";
     [self.btn_submit.layer setBorderWidth:1];
     [self.btn_submit.layer setMasksToBounds:YES];
     [self.btn_submit.layer setBorderColor:[UIColor blueColor].CGColor];
+    NSString *path = [[NSBundle mainBundle]pathForResource:@"loading" ofType:@"gif"];
+    _maskView = [[UIView alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    _maskView.backgroundColor = [UIColor colorWithRed:0.0f green:0.0f blue:0.0f alpha:0.5f];
+    _imageView = [[GifImageView alloc] initWithPath: path andFrame:rect];
+    [self.maskView addSubview:self.imageView];
 }
 
 

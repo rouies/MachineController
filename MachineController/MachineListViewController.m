@@ -8,6 +8,7 @@
 
 #import "MachineListViewController.h"
 #import "SearchResultTableViewController.h"
+#import "DetailViewController.h"
 
 @interface MachineListViewController ()
 
@@ -22,6 +23,10 @@
     identity = @"StandardCell";
     [self refurbish];
     SearchResultTableViewController* resultSearchController = [[SearchResultTableViewController alloc] initWithList:self.macList andWin:self.winList];
+    resultSearchController.handler = ^(NSString* identity,NSString* name){
+        [self performSegueWithIdentifier:@"SegueDetail" sender:self];
+        [self.searchController setActive:NO];
+    };
     self.searchController = [[UISearchController alloc]initWithSearchResultsController:resultSearchController];
     UISearchBar* searchBar = self.searchController.searchBar;
     searchBar.placeholder = @"请输入您要查询的设备信息";
@@ -151,17 +156,21 @@
         [cell.textLabel setText:self.winList[indexPath.row][@"obj_name"]];
         [cell.detailTextLabel setText:self.winList[indexPath.row][@"desc"]];
     }
-    
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     return cell;
 }
 
-/*
-- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
-    
+-(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+    if([segue.identifier isEqualToString:@"SegueDetail"]){
+        DetailViewController* dc = (DetailViewController*)segue.destinationViewController;
+        NSIndexPath* index =  [self.tableView indexPathForSelectedRow];
+        if(index.section == 0){
+            dc.name = self.macList[index.row][@"obj_name"];
+            dc.identity = self.macList[index.row][@"id"];
+        } else if(index.section == 1){
+            dc.name = self.winList[index.row][@"obj_name"];
+            dc.identity = self.winList[index.row][@"id"];
+        }
+    }
 }
-
--(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(nonnull NSIndexPath *)indexPath{
-    return 60.0f;
-}
-*/
 @end
